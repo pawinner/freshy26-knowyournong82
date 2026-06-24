@@ -131,10 +131,13 @@ function App() {
     }
 
     const nonce = Math.random().toString(36).substring(2);
+    // Normalize redirect URI to remove trailing slash for root URL, as Google OAuth is strict about exact matches
+    const redirectUri = window.location.origin + (window.location.pathname === "/" ? "" : window.location.pathname);
+
     // Construct Google OAuth Implicit Flow auth URL (forces domain selection to @docchula.com)
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` + 
       `client_id=${clientId}` +
-      `&redirect_uri=${encodeURIComponent(window.location.origin + window.location.pathname)}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&response_type=id_token` +
       `&scope=${encodeURIComponent("openid email profile")}` +
       `&nonce=${nonce}` +
