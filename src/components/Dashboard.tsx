@@ -112,6 +112,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ freshmen, email, onSignOut
           </div>
         )}
       </main>
+
+      {/* Footer support contact */}
+      <footer className="support-contact" style={{ borderTop: '1px solid var(--card-border)', marginTop: 'auto', padding: '1.5rem 1rem' }}>
+        พบปัญหาการใช้งานติดต่อ Line ID: <span className="support-contact-id">pawin_p</span>
+      </footer>
     </div>
   );
 };

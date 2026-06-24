@@ -56,6 +56,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             Sign in with Docchula
           </button>
         )}
+
+        <div className="support-contact" style={{ borderTop: "1px solid var(--card-border)", marginTop: "2rem", paddingTop: "1.5rem" }}>
+          พบปัญหาการใช้งานติดต่อ Line ID: <span className="support-contact-id">pawin_p</span>
+        </div>
       </div>
     </div>
   );
