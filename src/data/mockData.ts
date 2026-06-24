@@ -85,47 +85,6 @@ function getRecordValue(
 }
 
 /**
- * Returns a custom gradient based on the student's House (บ้าน) number 1-12.
- * Returns null if the house is outside of 1-12 or not recognized.
- */
-export function getHouseGradient(house: string | number | undefined): string | null {
-  if (!house) return null;
-  const match = String(house).match(/\d+/);
-  if (!match) return null;
-  const houseNum = parseInt(match[0], 10);
-  
-  switch (houseNum) {
-    case 1:
-      return "linear-gradient(135deg, #FCE38A 0%, #EFBA45 100%)";
-    case 2:
-      return "linear-gradient(135deg, #FFA0A0 0%, #D55B5B 100%)";
-    case 3:
-      return "linear-gradient(135deg, #743079 0%, #320B35 100%)";
-    case 4:
-      return "linear-gradient(135deg, #B2FCFA 0%, #75E2E0 100%)";
-    case 5:
-      return "linear-gradient(135deg, #1A44B0 0%, #081D56 100%)";
-    case 6:
-      return "linear-gradient(135deg, #9E8170 0%, #695243 100%)";
-    case 7:
-      return "linear-gradient(135deg, #9B789C 0%, #604361 100%)";
-    case 8:
-      return "linear-gradient(135deg, #EC95B0 0%, #BF5A7B 100%)";
-    case 9:
-      return "linear-gradient(135deg, #5CA054 0%, #2D5A27 100%)";
-    case 10:
-      // #FFF6C1 is extremely bright, so we start with a darker golden hue (#E2B755) to maintain contrast for white text
-      return "linear-gradient(135deg, #E2B755 0%, #FFF6C1 100%)";
-    case 11:
-      return "linear-gradient(135deg, #F8C384 0%, #F09835 100%)";
-    case 12:
-      return "linear-gradient(135deg, #9EE4B1 0%, #6AB87E 100%)";
-    default:
-      return null;
-  }
-}
-
-/**
  * Maps a raw record from the Google Apps Script Web App (matching Sheet header names)
  * into a structured Freshman interface.
  */
@@ -138,8 +97,6 @@ export function mapSheetRecordToFreshman(record: any, index: number): Freshman {
     "linear-gradient(135deg, #8A2387 0%, #E94057 50%, #F27121 100%)"
   ];
 
-  const house = String(getRecordValue(record, "บ้าน", (k) => k.includes("บ้าน"), ""));
-
   return {
     id: record.id || `freshman-${index}`,
     pDocchula: getRecordValue(record, "P_Docchula", (k) => k.toLowerCase().includes("docchula") || k.includes("อีเมลพี่")),
@@ -149,13 +106,13 @@ export function mapSheetRecordToFreshman(record: any, index: number): Freshman {
     firstName: getRecordValue(record, "ชื่อ", (k) => (k.includes("ชื่อ") && !k.includes("เล่น") && !k.includes("พี่")) || k.includes("ชื่อจริง")),
     lastName: getRecordValue(record, "นามสกุล", (k) => k.includes("นามสกุล")),
     nickname: getRecordValue(record, "ชื่อเล่น", (k) => k.includes("ชื่อเล่น") || k.includes("เล่น")),
-    house,
+    house: String(getRecordValue(record, "บ้าน", (k) => k.includes("บ้าน"), "")),
     instagram: getRecordValue(record, "N_Instagram", (k) => k.toLowerCase().includes("instagram") || k.toLowerCase().includes("ig") || k.includes("ไอจี")),
     messageToP: getRecordValue(record, "อยากฝากบอกอะไรพี่รหัสมั้ยเอ่ย", (k) => k.includes("ฝากบอก") || k.includes("ฝากข้อความ") || k.includes("บอกพี่รหัส") || k.includes("อยากฝาก") || k.includes("ไหมเอ่ย")),
     favoriteFoods: getRecordValue(record, "อาหาร/ขนมที่น้องชอบทาน", (k) => k.includes("อาหาร") || k.includes("ขนม") || k.includes("ของกิน")),
     interests: getRecordValue(record, "ของที่น้องชอบ/อยากได้/ความชอบ/ความสนใจ", (k) => (k.includes("ชอบ") || k.includes("อยากได้") || k.includes("สนใจ")) && !k.includes("อาหาร") && !k.includes("ขนม")),
     allergies: getRecordValue(record, "ข้อจำกัดด้านอาหาร", (k) => k.includes("ข้อจำกัด") || k.includes("แพ้") || k.includes("อาหารเจ") || k.includes("มังสวิรัติ")),
-    profileColor: getHouseGradient(house) || profileColors[index % profileColors.length]
+    profileColor: profileColors[index % profileColors.length]
   };
 }
 
@@ -175,7 +132,7 @@ export const mockFreshmen: Freshman[] = [
     favoriteFoods: "ชาบู, ขนมปังนมโสดนูเทลล่า afteryou",
     interests: "popmart (Hirono Dimoo)",
     allergies: "-",
-    profileColor: "linear-gradient(135deg, #EC95B0 0%, #BF5A7B 100%)"
+    profileColor: "linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)"
   },
   {
     id: "2",
@@ -192,7 +149,7 @@ export const mockFreshmen: Freshman[] = [
     favoriteFoods: "ขนมปัง sunmoulin",
     interests: "พี่ว่าผมชอบอะไรผมชอบอันนั้นครับ",
     allergies: "-",
-    profileColor: "linear-gradient(135deg, #B2FCFA 0%, #75E2E0 100%)"
+    profileColor: "linear-gradient(135deg, #F35588 0%, #FF8FA3 100%)"
   },
   {
     id: "3",
@@ -209,7 +166,7 @@ export const mockFreshmen: Freshman[] = [
     favoriteFoods: "ชาเขียว, ซูชิ",
     interests: "tattoo colour, ตุ๊กตาcrybaby",
     allergies: "-",
-    profileColor: "linear-gradient(135deg, #1A44B0 0%, #081D56 100%)"
+    profileColor: "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)"
   },
   {
     id: "4",
@@ -226,7 +183,7 @@ export const mockFreshmen: Freshman[] = [
     favoriteFoods: "มัทฉะ/ชานมไข่มุก/วาราบิโมจิ",
     interests: "โคนัน/Doraemon",
     allergies: "ม่ายค่อยมี",
-    profileColor: "linear-gradient(135deg, #EC95B0 0%, #BF5A7B 100%)"
+    profileColor: "linear-gradient(135deg, #3a7bd5 0%, #3a6073 100%)"
   },
   {
     id: "5",
@@ -243,7 +200,7 @@ export const mockFreshmen: Freshman[] = [
     favoriteFoods: "ไอศครีม, คุกกี้",
     interests: "ชอบเล่นเกม (เช่น Overwatch, Minecraft ฯลฯ), ตุ๊กตาน่ารักๆ, อาหารอร่อยๆ",
     allergies: "-",
-    profileColor: "linear-gradient(135deg, #EC95B0 0%, #BF5A7B 100%)"
+    profileColor: "linear-gradient(135deg, #8A2387 0%, #E94057 50%, #F27121 100%)"
   },
   {
     id: "6",
@@ -260,7 +217,7 @@ export const mockFreshmen: Freshman[] = [
     favoriteFoods: "ชาเขียว",
     interests: "อะไรก็ได้ครับ",
     allergies: "-",
-    profileColor: "linear-gradient(135deg, #9EE4B1 0%, #6AB87E 100%)"
+    profileColor: "linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)"
   },
   {
     id: "7",
@@ -277,6 +234,6 @@ export const mockFreshmen: Freshman[] = [
     favoriteFoods: "คุ้กกี้อาร์เซนอล",
     interests: "ปากกาเขียนดีๆครับ😉",
     allergies: "ไม่ทานเผ็ด",
-    profileColor: "linear-gradient(135deg, #9B789C 0%, #604361 100%)"
+    profileColor: "linear-gradient(135deg, #F35588 0%, #FF8FA3 100%)"
   }
 ];
