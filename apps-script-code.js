@@ -66,12 +66,19 @@ function doGet(e) {
 
     var headers = values[0];
     
-    // Find column index for P_Docchula
+    // Find column indices
     var pDocchulaIndex = -1;
+    var firstVisitCol = -1;
+    var latestVisitCol = -1;
+    
     for (var col = 0; col < headers.length; col++) {
-      if (String(headers[col]).trim() === "P_Docchula") {
+      var headerName = String(headers[col]).trim();
+      if (headerName === "P_Docchula") {
         pDocchulaIndex = col;
-        break;
+      } else if (headerName === "first_visit") {
+        firstVisitCol = col;
+      } else if (headerName === "latest_visit") {
+        latestVisitCol = col;
       }
     }
 
@@ -79,11 +86,27 @@ function doGet(e) {
       return jsonResponse({ success: false, error: "P_Docchula database column not found in Google Sheet" });
     }
 
-    // 5. Query matching rows
+    var formattedDate = Utilities.formatDate(new Date(), spreadsheet.getSpreadsheetTimeZone(), "dd/MM/yy HH:mm:ss");
+
+    // 5. Query matching rows and update login timestamps
     var matches = [];
     for (var row = 1; row < values.length; row++) {
       var rowEmail = String(values[row][pDocchulaIndex]).toLowerCase().trim();
       if (rowEmail === email) {
+        // Update first_visit or latest_visit dynamically
+        if (firstVisitCol !== -1) {
+          var currentFirstVisit = String(values[row][firstVisitCol]).trim();
+          if (!currentFirstVisit) {
+            // First time login: print on first_visit only
+            sheet.getRange(row + 1, firstVisitCol + 1).setValue(formattedDate);
+            values[row][firstVisitCol] = formattedDate;
+          } else if (latestVisitCol !== -1) {
+            // Upcoming times: overwrite latest_visit
+            sheet.getRange(row + 1, latestVisitCol + 1).setValue(formattedDate);
+            values[row][latestVisitCol] = formattedDate;
+          }
+        }
+
         var record = {};
         for (var col = 0; col < headers.length; col++) {
           var headerName = String(headers[col]).trim();
