@@ -47,6 +47,47 @@ export function formatInstagramDisplay(igInput: string): string {
  * Maps a raw record from the Google Apps Script Web App (matching Sheet header names)
  * into a structured Freshman interface.
  */
+/**
+ * Helper to retrieve values from Google Sheets rows with resilience against
+ * minor header variations (case mismatches, spacing, question marks, or slight wording changes).
+ */
+function getRecordValue(
+  record: any,
+  exactKey: string,
+  fuzzyMatch: (key: string) => boolean,
+  defaultValue: any = ""
+): any {
+  if (!record) return defaultValue;
+
+  // 1. Try exact match first
+  if (record[exactKey] !== undefined && record[exactKey] !== null) {
+    return record[exactKey];
+  }
+
+  const keys = Object.keys(record);
+
+  // 2. Try case-insensitive, trimmed match
+  const targetLower = exactKey.trim().toLowerCase();
+  for (const k of keys) {
+    if (k.trim().toLowerCase() === targetLower) {
+      return record[k];
+    }
+  }
+
+  // 3. Try callback fuzzy matching
+  for (const k of keys) {
+    if (fuzzyMatch(k)) {
+      return record[k];
+    }
+  }
+
+  return defaultValue;
+}
+
+/**
+ * Maps a raw record from the Google Apps Script Web App (matching Sheet header names)
+ * into a structured Freshman interface.
+ */
 export function mapSheetRecordToFreshman(record: any, index: number): Freshman {
   const profileColors = [
     "linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)",
@@ -58,19 +99,19 @@ export function mapSheetRecordToFreshman(record: any, index: number): Freshman {
 
   return {
     id: record.id || `freshman-${index}`,
-    pDocchula: record["P_Docchula"] || "",
-    kinshipId: String(record["สายรหัส"] || ""),
-    pNickname: record["P_Nickname"] || "",
-    title: record["คำนำหน้า"] || "",
-    firstName: record["ชื่อ"] || "",
-    lastName: record["นามสกุล"] || "",
-    nickname: record["ชื่อเล่น"] || "",
-    house: String(record["บ้าน"] || ""),
-    instagram: record["N_Instagram"] || "",
-    messageToP: record["อยากฝากบอกอะไรพี่รหัสไหมเอ่ย?"] || "",
-    favoriteFoods: record["อาหาร/ขนมที่น้องชอบทาน"] || "",
-    interests: record["ของที่น้องชอบ/อยากได้/ความชอบ/ความสนใจ"] || "",
-    allergies: record["ข้อจำกัดด้านอาหาร"] || "",
+    pDocchula: getRecordValue(record, "P_Docchula", (k) => k.toLowerCase().includes("docchula") || k.includes("อีเมลพี่")),
+    kinshipId: String(getRecordValue(record, "สายรหัส", (k) => k.includes("สายรหัส") || k.includes("สาย"), "")),
+    pNickname: getRecordValue(record, "P_Nickname", (k) => k.toLowerCase().includes("p_nickname") || k.toLowerCase().includes("nicknameพี่")),
+    title: getRecordValue(record, "คำนำหน้า", (k) => k.includes("คำนำหน้า")),
+    firstName: getRecordValue(record, "ชื่อ", (k) => (k.includes("ชื่อ") && !k.includes("เล่น") && !k.includes("พี่")) || k.includes("ชื่อจริง")),
+    lastName: getRecordValue(record, "นามสกุล", (k) => k.includes("นามสกุล")),
+    nickname: getRecordValue(record, "ชื่อเล่น", (k) => k.includes("ชื่อเล่น") || k.includes("เล่น")),
+    house: String(getRecordValue(record, "บ้าน", (k) => k.includes("บ้าน"), "")),
+    instagram: getRecordValue(record, "N_Instagram", (k) => k.toLowerCase().includes("instagram") || k.toLowerCase().includes("ig") || k.includes("ไอจี")),
+    messageToP: getRecordValue(record, "อยากฝากบอกอะไรพี่รหัสมั้ยเอ่ย", (k) => k.includes("ฝากบอก") || k.includes("ฝากข้อความ") || k.includes("บอกพี่รหัส") || k.includes("อยากฝาก") || k.includes("ไหมเอ่ย")),
+    favoriteFoods: getRecordValue(record, "อาหาร/ขนมที่น้องชอบทาน", (k) => k.includes("อาหาร") || k.includes("ขนม") || k.includes("ของกิน")),
+    interests: getRecordValue(record, "ของที่น้องชอบ/อยากได้/ความชอบ/ความสนใจ", (k) => (k.includes("ชอบ") || k.includes("อยากได้") || k.includes("สนใจ")) && !k.includes("อาหาร") && !k.includes("ขนม")),
+    allergies: getRecordValue(record, "ข้อจำกัดด้านอาหาร", (k) => k.includes("ข้อจำกัด") || k.includes("แพ้") || k.includes("อาหารเจ") || k.includes("มังสวิรัติ")),
     profileColor: profileColors[index % profileColors.length]
   };
 }

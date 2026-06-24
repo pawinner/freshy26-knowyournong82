@@ -99,6 +99,21 @@ function App() {
     const scriptId = "google-gsi-client-script";
     let script = document.getElementById(scriptId) as HTMLScriptElement;
     
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const renderGoogleButton = () => {
+      const btnContainer = document.getElementById("google-signin-button-container");
+      if (btnContainer && window.google) {
+        const isDarkMode = mediaQuery.matches;
+        window.google.accounts.id.renderButton(btnContainer, {
+          theme: isDarkMode ? "filled_black" : "outline",
+          size: "large",
+          shape: "pill",
+          width: 320
+        });
+      }
+    };
+
     const initGoogleSignIn = () => {
       if (isPlaceholderClientId) {
         console.warn("VITE_GOOGLE_CLIENT_ID not configured in .env file.");
@@ -117,6 +132,7 @@ function App() {
       try {
         window.google.accounts.id.initialize({
           client_id: clientId,
+          hd: "docchula.com", // Restricts Google Account Picker to @docchula.com domain
           callback: (response: any) => {
             const payload = decodeJwt(response.credential);
             if (payload && payload.email) {
@@ -132,18 +148,19 @@ function App() {
           }
         });
         
-        const btnContainer = document.getElementById("google-signin-button-container");
-        if (btnContainer) {
-          window.google.accounts.id.renderButton(btnContainer, {
-            theme: "outline",
-            size: "large",
-            width: 320
-          });
-        }
+        renderGoogleButton();
       } catch (err) {
         console.error("Google SSO initialization error:", err);
       }
     };
+
+    const handleThemeChange = () => {
+      if (window.google && !isPlaceholderClientId) {
+        renderGoogleButton();
+      }
+    };
+
+    mediaQuery.addEventListener("change", handleThemeChange);
 
     if (!script) {
       script = document.createElement("script");
@@ -160,38 +177,11 @@ function App() {
     } else if (window.google) {
       initGoogleSignIn();
     }
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleThemeChange);
+    };
   }, [loggedInUser]);
-
-  // 3. Handle developer mock sign in bypass
-  const handleSignInMock = (email: string) => {
-    setIsLoading(true);
-    setErrorMessage(null);
-
-    const cleanEmail = email.toLowerCase().trim();
-
-    // Verify @docchula.com constraints for simulated logins
-    if (!cleanEmail.endsWith("@docchula.com") && cleanEmail !== "stranger@gmail.com") {
-      setErrorMessage("เข้าสู่ระบบไม่สำเร็จ: บัญชีจำลองต้องเป็น @docchula.com");
-      setIsLoading(false);
-      return;
-    }
-
-    if (cleanEmail === "stranger@gmail.com") {
-      setErrorMessage("เข้าสู่ระบบไม่สำเร็จ: ขออภัยด้วยครับ ระบบอนุญาตเฉพาะอีเมลคณะแพทย์ (@docchula.com) เท่านั้น");
-      setIsLoading(false);
-      return;
-    }
-
-    // Load from local mock data
-    setTimeout(() => {
-      const matches = mockFreshmen.filter(
-        (nong) => nong.pDocchula.toLowerCase().trim() === cleanEmail
-      );
-      setFreshmen(matches);
-      setLoggedInUser({ email: cleanEmail });
-      setIsLoading(false);
-    }, 500);
-  };
 
   const handleSignOut = () => {
     setLoggedInUser(null);
@@ -209,7 +199,6 @@ function App() {
         />
       ) : (
         <LandingPage 
-          onSignInMock={handleSignInMock} 
           isLoading={isLoading} 
           errorMessage={errorMessage} 
         />
