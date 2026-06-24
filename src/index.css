@@ -15,6 +15,7 @@
   --card-bg: rgba(255, 255, 255, 0.7);
   --card-border: rgba(223, 42, 93, 0.12);
   --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+  --header-bg: rgba(251, 251, 254, 0.85);
   
   --text-primary: #1e293b;
   --text-secondary: #64748b;
@@ -38,6 +39,7 @@
     --card-bg: rgba(17, 24, 39, 0.75);
     --card-border: rgba(255, 255, 255, 0.08);
     --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --header-bg: rgba(11, 15, 25, 0.85);
     
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
@@ -120,6 +122,15 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
 }
 
+.camp-logo-img {
+  display: block;
+  max-width: 220px;
+  width: 100%;
+  height: auto;
+  margin: 0 auto 1.5rem auto;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
 .landing-title {
   font-size: 2.25rem;
   color: var(--text-primary);
@@ -174,12 +185,13 @@ h1, h2, h3, h4, h5, h6 {
 /* Dashboard Layout */
 .dashboard-header {
   border-bottom: 1px solid var(--card-border);
-  background: rgba(var(--card-bg), 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--header-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
   z-index: 50;
+  transition: background-color 0.3s ease;
 }
 
 .header-content {
@@ -199,19 +211,33 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .logo-badge {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary) 0%, #ff8fa3 100%);
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 8px;
   font-family: var(--font-heading);
   font-weight: 800;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(223, 42, 93, 0.15);
+  letter-spacing: 0.5px;
+}
+
+.header-logo-img {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
 }
 
 .logo-text {
   font-size: 1.15rem;
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .user-profile-bar {
@@ -229,6 +255,8 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   font-size: 0.9rem;
   font-family: var(--font-heading);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-logout {
@@ -241,12 +269,44 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   font-size: 0.85rem;
   transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-logout:hover {
   background: rgba(223, 42, 93, 0.08);
   color: var(--primary);
   border-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0.85rem 1rem;
+    gap: 0.75rem;
+  }
+  .logo-badge {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+  }
+  .header-logo-img {
+    height: 28px;
+  }
+  .logo-text {
+    display: none;
+  }
+  .user-profile-bar {
+    gap: 0.5rem;
+  }
+  .kinship-group-badge {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.65rem;
+  }
+  .btn-logout {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 6px;
+  }
 }
 
 /* Dashboard Body */

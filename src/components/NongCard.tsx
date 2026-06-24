@@ -74,7 +74,7 @@ export const NongCard: React.FC<NongCardProps> = ({ nong }) => {
       {/* Favorite Foods */}
       <div className="card-section">
         <span className="section-label">
-          🍱 อาหาร/ขนมที่ชอบทาน
+          🍱 อาหาร/ขนมที่น้องชอบทาน
         </span>
         <p className="section-value">{nong.favoriteFoods || "ไม่ได้ระบุ"}</p>
       </div>

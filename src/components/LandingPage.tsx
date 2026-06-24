@@ -18,7 +18,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <div className="blur-circle circle-2"></div>
 
       <div className="landing-card">
-        <div className="camp-badge">MDCU FRESHY CAMP 2026</div>
+        <img src="/typography.png" alt="MDCU Freshy Camp 2026" className="camp-logo-img" />
         
         <h1 className="landing-title">จดหมายถึงพี่รหัส</h1>
         

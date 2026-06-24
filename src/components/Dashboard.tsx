@@ -22,7 +22,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ freshmen, email, onSignOut
       <header className="dashboard-header">
         <div className="header-content">
           <div className="logo-section">
-            <span className="logo-badge">MDCU</span>
+            <img src="/typography.png" alt="MDCU Freshy Camp 2026" className="header-logo-img" />
             <span className="logo-text">จดหมายถึงพี่รหัส</span>
           </div>
           
@@ -41,7 +41,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ freshmen, email, onSignOut
       <main className="dashboard-main" style={{ maxWidth: "800px", margin: "0 auto", width: "100%" }}>
         {/* Welcome Section */}
         <div className="dashboard-intro" style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <div style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>🌸</div>
           <h2>ยินดีต้อนรับ พี่{seniorNickname}!</h2>
           <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", marginTop: "0.25rem" }}>
             เข้าสู่ระบบสำเร็จด้วยอีเมล: <span style={{ fontFamily: "var(--font-heading)", fontWeight: 500 }}>{email}</span>
