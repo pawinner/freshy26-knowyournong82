@@ -32,6 +32,16 @@ const decodeJwt = (token: string) => {
   }
 };
 
+const getGoogleRedirectUri = () => {
+  const configuredRedirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI?.trim();
+
+  if (configuredRedirectUri) {
+    return configuredRedirectUri;
+  }
+
+  return window.location.origin + (window.location.pathname === "/" ? "" : window.location.pathname);
+};
+
 function App() {
   const [loggedInUser, setLoggedInUser] = useState<{ email: string } | null>(null);
   const [freshmen, setFreshmen] = useState<Freshman[]>([]);
@@ -131,8 +141,8 @@ function App() {
     }
 
     const nonce = Math.random().toString(36).substring(2);
-    // Normalize redirect URI to remove trailing slash for root URL, as Google OAuth is strict about exact matches
-    const redirectUri = window.location.origin + (window.location.pathname === "/" ? "" : window.location.pathname);
+    const redirectUri = getGoogleRedirectUri();
+    console.info("Google OAuth redirect_uri:", redirectUri);
 
     // Construct Google OAuth Implicit Flow auth URL (forces domain selection to @docchula.com)
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` + 
