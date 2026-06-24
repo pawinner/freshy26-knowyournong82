@@ -23,9 +23,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <h1 className="landing-title">จดหมายถึงพี่รหัส</h1>
         
         <p className="landing-subtitle">
-          ระบบส่องความโปรด ข้อความ และรายละเอียดสิ่งของที่น้องรหัสชื่นชอบ 
-          กรุณาเข้าสู่ระบบด้วยบัญชี Google คณะแพทย์ (@docchula.com) 
-          เพื่อความปลอดภัยของข้อมูลตามนโยบาย PDPA 🛡️
+           
+          กรุณาเข้าสู่ระบบด้วยบัญชี (@docchula.com) 
         </p>
 
         {/* Error message banner */}

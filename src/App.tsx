@@ -116,7 +116,7 @@ function App() {
           if (email.endsWith("@docchula.com")) {
             fetchFreshmenData(idToken, email);
           } else {
-            setErrorMessage("เข้าสู่ระบบไม่สำเร็จ: กรุณาใช้อีเมลคณะแพทย์ (@docchula.com) เท่านั้น");
+            setErrorMessage("เข้าสู่ระบบไม่สำเร็จ: กรุณาใช้อีเมล (@docchula.com) เท่านั้น");
             setIsLoading(false);
           }
         } else {
