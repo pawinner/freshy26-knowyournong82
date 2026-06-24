@@ -7,9 +7,6 @@ interface NongCardProps {
 }
 
 export const NongCard: React.FC<NongCardProps> = ({ nong }) => {
-  // Extract initial for avatar placeholder
-  const avatarLetter = nong.nickname.charAt(0);
-
   // Check if freshman has food restrictions / allergies
   const hasAllergies = nong.allergies && 
     nong.allergies.toLowerCase() !== "none" && 
@@ -26,16 +23,13 @@ export const NongCard: React.FC<NongCardProps> = ({ nong }) => {
 
   return (
     <div className="nong-card">
-      {/* Kinship Code Badge */}
-      <span className="nong-kinship-tag">สาย {nong.kinshipId}</span>
-
       {/* Header Info */}
       <div className="card-header-info">
         <div 
           className="nong-avatar" 
           style={{ background: nong.profileColor || "linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)" }}
         >
-          {avatarLetter}
+          {nong.kinshipId}
         </div>
         <div className="nong-name-block">
           <h3 className="nong-nickname">น้อง{nong.nickname}</h3>
@@ -67,12 +61,30 @@ export const NongCard: React.FC<NongCardProps> = ({ nong }) => {
         )}
       </div>
 
+      {/* Message to P'Rahas (with pre-wrap newlines) */}
+      <div className="card-section">
+        <span className="section-label">
+          ✉️ อยากฝากบอกอะไรพี่รหัสไหมเอ่ย?
+        </span>
+        <div className="message-container">
+          <p className="message-text">{nong.messageToP || "น้องไม่ได้ฝากข้อความไว้"}</p>
+        </div>
+      </div>
+
       {/* Favorite Foods */}
       <div className="card-section">
         <span className="section-label">
           🍱 อาหาร/ขนมที่ชอบทาน
         </span>
         <p className="section-value">{nong.favoriteFoods || "ไม่ได้ระบุ"}</p>
+      </div>
+
+      {/* Interests / Hobbies */}
+      <div className="card-section">
+        <span className="section-label">
+          🎨 ของที่น้องชอบ / อยากได้ / ความชอบ / ความสนใจ
+        </span>
+        <p className="section-value">{nong.interests || "ไม่ได้ระบุ"}</p>
       </div>
 
       {/* Allergies / Restrictions */}
@@ -90,24 +102,6 @@ export const NongCard: React.FC<NongCardProps> = ({ nong }) => {
               ไม่มีข้อจำกัดด้านอาหาร
             </span>
           )}
-        </div>
-      </div>
-
-      {/* Interests / Hobbies */}
-      <div className="card-section">
-        <span className="section-label">
-          🎨 ของที่น้องชอบ / อยากได้ / ความชอบ / ความสนใจ
-        </span>
-        <p className="section-value">{nong.interests || "ไม่ได้ระบุ"}</p>
-      </div>
-
-      {/* Message to P'Rahas (with pre-wrap newlines) */}
-      <div className="card-section">
-        <span className="section-label">
-          ✉️ อยากฝากบอกอะไรพี่รหัสไหมเอ่ย?
-        </span>
-        <div className="message-container">
-          <p className="message-text">{nong.messageToP || "น้องไม่ได้ฝากข้อความไว้"}</p>
         </div>
       </div>
     </div>

@@ -88,100 +88,60 @@ function App() {
     }
   };
 
-  // 2. Load Google Identity Services script and render Sign-In button
+  // 2. Check for redirected Google OAuth token in hash on load
   useEffect(() => {
+    if (window.location.hash) {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      const idToken = params.get("id_token");
+      
+      if (idToken) {
+        // Clean URL address bar by removing the hash fragment
+        window.history.replaceState(null, "", window.location.pathname);
+        
+        setIsLoading(true);
+        const payload = decodeJwt(idToken);
+        if (payload && payload.email) {
+          const email = payload.email.toLowerCase().trim();
+          if (email.endsWith("@docchula.com")) {
+            fetchFreshmenData(idToken, email);
+          } else {
+            setErrorMessage("เข้าสู่ระบบไม่สำเร็จ: กรุณาใช้อีเมลคณะแพทย์ (@docchula.com) เท่านั้น");
+            setIsLoading(false);
+          }
+        } else {
+          setErrorMessage("ไม่สามารถดึงข้อมูลอีเมลผู้ใช้จากบัญชี Google ได้");
+          setIsLoading(false);
+        }
+      }
+    }
+  }, []);
+
+  const handleSignInGoogleCustom = () => {
+    setIsLoading(true);
+    setErrorMessage(null);
+
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     const isPlaceholderClientId = !clientId || clientId.includes("your-google-oauth-client-id");
-    
-    // Do not load Sign-in script if already logged in
-    if (loggedInUser) return;
-    
-    const scriptId = "google-gsi-client-script";
-    let script = document.getElementById(scriptId) as HTMLScriptElement;
-    
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-    const renderGoogleButton = () => {
-      const btnContainer = document.getElementById("google-signin-button-container");
-      if (btnContainer && window.google) {
-        const isDarkMode = mediaQuery.matches;
-        window.google.accounts.id.renderButton(btnContainer, {
-          theme: isDarkMode ? "filled_black" : "outline",
-          size: "large",
-          shape: "pill",
-          width: 320
-        });
-      }
-    };
-
-    const initGoogleSignIn = () => {
-      if (isPlaceholderClientId) {
-        console.warn("VITE_GOOGLE_CLIENT_ID not configured in .env file.");
-        const container = document.getElementById("google-signin-button-container");
-        if (container) {
-          container.innerHTML = `
-            <div style="color: var(--text-secondary); font-size: 0.9rem; padding: 0.8rem; border: 1px dashed var(--card-border); border-radius: 12px; width: 100%; text-align: center; background: rgba(223, 42, 93, 0.03);">
-              🔒 Google Sign-In Not Configured (.env)
-              <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.35rem;">กรุณาคลิกเลือก "Demo Mode" ด้านล่างเพื่อเข้าทดสอบทดลองใช้</div>
-            </div>
-          `;
-        }
-        return;
-      }
-
-      try {
-        window.google.accounts.id.initialize({
-          client_id: clientId,
-          hd: "docchula.com", // Restricts Google Account Picker to @docchula.com domain
-          callback: (response: any) => {
-            const payload = decodeJwt(response.credential);
-            if (payload && payload.email) {
-              const email = payload.email.toLowerCase().trim();
-              if (email.endsWith("@docchula.com")) {
-                fetchFreshmenData(response.credential, email);
-              } else {
-                setErrorMessage("เข้าสู่ระบบไม่สำเร็จ: กรุณาใช้อีเมลคณะแพทย์ (@docchula.com) เท่านั้น");
-              }
-            } else {
-              setErrorMessage("ไม่สามารถดึงข้อมูลอีเมลผู้ใช้จากบัญชี Google ได้");
-            }
-          }
-        });
-        
-        renderGoogleButton();
-      } catch (err) {
-        console.error("Google SSO initialization error:", err);
-      }
-    };
-
-    const handleThemeChange = () => {
-      if (window.google && !isPlaceholderClientId) {
-        renderGoogleButton();
-      }
-    };
-
-    mediaQuery.addEventListener("change", handleThemeChange);
-
-    if (!script) {
-      script = document.createElement("script");
-      script.src = "https://accounts.google.com/gsi/client";
-      script.id = scriptId;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        if (window.google) {
-          initGoogleSignIn();
-        }
-      };
-      document.body.appendChild(script);
-    } else if (window.google) {
-      initGoogleSignIn();
+    if (isPlaceholderClientId) {
+      setErrorMessage("🔒 Google Sign-In Not Configured (.env) - กรุณาตรวจสอบการตั้งค่า");
+      setIsLoading(false);
+      return;
     }
 
-    return () => {
-      mediaQuery.removeEventListener("change", handleThemeChange);
-    };
-  }, [loggedInUser]);
+    const nonce = Math.random().toString(36).substring(2);
+    // Construct Google OAuth Implicit Flow auth URL (forces domain selection to @docchula.com)
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` + 
+      `client_id=${clientId}` +
+      `&redirect_uri=${encodeURIComponent(window.location.origin + window.location.pathname)}` +
+      `&response_type=id_token` +
+      `&scope=${encodeURIComponent("openid email profile")}` +
+      `&nonce=${nonce}` +
+      `&hd=docchula.com`;
+
+    window.location.href = authUrl;
+  };
 
   const handleSignOut = () => {
     setLoggedInUser(null);
@@ -199,6 +159,7 @@ function App() {
         />
       ) : (
         <LandingPage 
+          onSignInGoogleCustom={handleSignInGoogleCustom}
           isLoading={isLoading} 
           errorMessage={errorMessage} 
         />
