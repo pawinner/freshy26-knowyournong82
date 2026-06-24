@@ -16,8 +16,8 @@
  * 12. Paste this URL into your React project's .env file as VITE_APPS_SCRIPT_URL.
  */
 
-// REPLACE THIS WITH YOUR GOOGLE SHEET ID (can find it in your sheet's browser URL)
-const GOOGLE_SHEET_ID = "YOUR_SPREADSHEET_ID_HERE";
+// PRE-CONFIGURED WITH YOUR GOOGLE SHEET ID
+const GOOGLE_SHEET_ID = "1Je7F67cS8A5HyoqWrVcPZEbEtATdpAgNm5o6VoA17s4";
 
 function doGet(e) {
   // Setup CORS support by creating a JSON response helper
@@ -53,7 +53,10 @@ function doGet(e) {
 
     // 4. Load database from Google Sheet
     var spreadsheet = SpreadsheetApp.openById(GOOGLE_SHEET_ID);
-    var sheet = spreadsheet.getActiveSheet();
+    var sheet = spreadsheet.getSheetByName("WEB");
+    if (!sheet) {
+      return jsonResponse({ success: false, error: "Tab 'WEB' not found in Google Sheet" });
+    }
     var range = sheet.getDataRange();
     var values = range.getValues();
     
