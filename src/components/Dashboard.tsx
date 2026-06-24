@@ -40,7 +40,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ freshmen, email, onSignOut
       {/* Main Content */}
       <main className="dashboard-main" style={{ maxWidth: "800px", margin: "0 auto", width: "100%" }}>
         {/* Welcome Section */}
-        <div className="dashboard-intro" style={{ textAlign: "center", marginBottom: "2rem" }}>
+        <div className="dashboard-intro" style={{ textAlign: "center", marginBottom: "-0.5rem" }}>
           <h2>ยินดีต้อนรับ พี่{seniorNickname}!</h2>
           <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", marginTop: "0.25rem" }}>
             เข้าสู่ระบบสำเร็จด้วยอีเมล: <span style={{ fontFamily: "var(--font-heading)", fontWeight: 500 }}>{email}</span>
